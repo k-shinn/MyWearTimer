@@ -31,7 +31,10 @@ import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
-fun IndicatorApp() {
+fun IndicatorApp(
+    onClickStart: () -> Unit,
+    onClickStop: () -> Unit
+) {
     var isPlaying by remember { mutableStateOf(false) }
     var ticks by remember { mutableStateOf(0) }
 
@@ -55,6 +58,11 @@ fun IndicatorApp() {
             ) {
                 CurrentTimer(ticks)
                 StartButton(isPlaying) {
+                    if (isPlaying) {
+                        onClickStop.invoke()
+                    } else {
+                        onClickStart.invoke()
+                    }
                     isPlaying = isPlaying.not()
                 }
             }
