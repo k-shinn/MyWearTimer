@@ -9,28 +9,70 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
+import com.kei.myweartimer.data.DataStore
 import com.kei.myweartimer.presentation.MainActivity
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-class MyForegroundService : Service() {
+class MyForegroundService : LifecycleService() {
 
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface DataStoreEntryPoint {
+        fun dataStore(): DataStore
+    }
+
+    private lateinit var dataStore: DataStore
     private lateinit var notificationManager: NotificationManager
 
     private val localBinder = LocalBinder()
 
+    private var timerJob: Job? = null
+
+
     override fun onCreate() {
         super.onCreate()
+
+        val entryPoint =
+            EntryPointAccessors.fromApplication(applicationContext, DataStoreEntryPoint::class.java)
+        dataStore = entryPoint.dataStore()
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
     override fun onBind(intent: Intent): IBinder {
+        super.onBind(intent)
         return localBinder
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         generateNotification()
-
+        startTimerLoop()
         return Service.START_NOT_STICKY
+    }
+
+    private fun startTimerLoop() {
+        timerJob = lifecycleScope.launch {
+            dataStore.setActiveTimer(true)
+            timerLoop()
+        }
+    }
+
+    private suspend fun timerLoop() {
+        var currentTime = 0
+        while (true) {
+            dataStore.setValueTime(currentTime)
+            delay(100)
+            currentTime++
+        }
     }
 
     fun startTimer() {
@@ -38,6 +80,10 @@ class MyForegroundService : Service() {
     }
 
     fun stopTimer() {
+        lifecycleScope.launch {
+            dataStore.setActiveTimer(false)
+        }
+        timerJob?.cancel()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }

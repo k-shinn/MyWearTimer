@@ -10,11 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -27,43 +23,33 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
-import kotlinx.coroutines.delay
-import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun IndicatorApp(
     onClickStart: () -> Unit,
-    onClickStop: () -> Unit
+    onClickStop: () -> Unit,
+    valueTime: Flow<Int>,
+    activeTimer: Flow<Boolean>
 ) {
-    var isPlaying by remember { mutableStateOf(false) }
-    var ticks by remember { mutableStateOf(0) }
-
-    if (isPlaying) {
-        LaunchedEffect(Unit) {
-            ticks = 0
-            while (isPlaying) {
-                delay(1.seconds)
-                ticks++
-            }
-        }
-    }
+    val currentTime = valueTime.collectAsState(initial = 0)
+    val isActive = activeTimer.collectAsState(initial = false)
 
     Scaffold(timeText = { TimeText() }) {
         Box(modifier = Modifier.fillMaxSize()) {
-            Indicator(progress = ticks)
+            Indicator(progress = currentTime.value)
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                CurrentTimer(ticks)
-                StartButton(isPlaying) {
-                    if (isPlaying) {
+                CurrentTimer(currentTime.value)
+                StartButton(isActive.value) {
+                    if (isActive.value) {
                         onClickStop.invoke()
                     } else {
                         onClickStart.invoke()
                     }
-                    isPlaying = isPlaying.not()
                 }
             }
         }

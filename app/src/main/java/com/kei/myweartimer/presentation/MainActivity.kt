@@ -70,7 +70,10 @@ class MainActivity : ComponentActivity() {
                     },
                     onClickStop = {
                         myForegroundService?.stopTimer()
-                    })
+                    },
+                    dataStore.valueTime,
+                    dataStore.activeTimer
+                )
             }
         }
     }
