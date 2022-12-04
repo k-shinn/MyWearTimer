@@ -59,7 +59,7 @@ fun IndicatorApp(
 @Composable
 fun Indicator(progress: Int) {
     CircularProgressIndicator(
-        progress = (progress / 100f),
+        progress = (progress / 45f),
         modifier = Modifier.fillMaxSize(),
         startAngle = 290f,
         endAngle = 250f,

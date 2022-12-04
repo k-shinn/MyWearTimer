@@ -70,8 +70,9 @@ class MyForegroundService : LifecycleService() {
         var currentTime = 0
         while (true) {
             dataStore.setValueTime(currentTime)
-            delay(100)
+            delay(1000)
             currentTime++
+            if (currentTime > 45) currentTime = 0
         }
     }
 
