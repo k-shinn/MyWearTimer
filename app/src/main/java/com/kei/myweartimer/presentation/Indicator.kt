@@ -1,5 +1,6 @@
 package com.kei.myweartimer.presentation
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -20,6 +22,7 @@ import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
+import androidx.wear.compose.material.ProgressIndicatorDefaults
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
@@ -35,9 +38,14 @@ fun IndicatorApp(
     val currentTime = valueTime.collectAsState(initial = 0)
     val isActive = activeTimer.collectAsState(initial = false)
 
+    val animatedProgress by animateFloatAsState(
+        targetValue = currentTime.value.toFloat(),
+        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
+    )
+
     Scaffold(timeText = { TimeText() }) {
         Box(modifier = Modifier.fillMaxSize()) {
-            Indicator(progress = currentTime.value)
+            Indicator(progress = animatedProgress)
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
@@ -57,7 +65,7 @@ fun IndicatorApp(
 }
 
 @Composable
-fun Indicator(progress: Int) {
+fun Indicator(progress: Float) {
     CircularProgressIndicator(
         progress = (progress / 45f),
         modifier = Modifier.fillMaxSize(),
