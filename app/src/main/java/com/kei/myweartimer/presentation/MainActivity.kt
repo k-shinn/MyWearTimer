@@ -64,7 +64,8 @@ class MainActivity : ComponentActivity() {
         setContent {
 //            WearApp("Android")
             MyWearTimerTheme {
-                IndicatorApp(
+//                IndicatorApp(
+                IndicatorAppOnlyDifferenceCalculation(
                     onClickStart = {
                         myForegroundService?.startTimer()
                     },
@@ -72,7 +73,8 @@ class MainActivity : ComponentActivity() {
                         myForegroundService?.stopTimer()
                     },
                     dataStore.valueTime,
-                    dataStore.activeTimer
+                    dataStore.activeTimer,
+                    dataStore.startTime
                 )
             }
         }

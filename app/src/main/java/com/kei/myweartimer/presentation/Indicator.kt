@@ -11,29 +11,43 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.Icon
+import androidx.wear.compose.material.LocalTextStyle
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.ProgressIndicatorDefaults
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Indicator
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+
+const val TIME_UNIT = 45f
+const val CALC_UNIT = 45f * 1000
 
 @Composable
 fun IndicatorApp(
     onClickStart: () -> Unit,
     onClickStop: () -> Unit,
     valueTime: Flow<Int>,
-    activeTimer: Flow<Boolean>
+    activeTimer: Flow<Boolean>,
+    startTime: Flow<Long>
 ) {
     val currentTime = valueTime.collectAsState(initial = 0)
     val isActive = activeTimer.collectAsState(initial = false)
@@ -65,9 +79,62 @@ fun IndicatorApp(
 }
 
 @Composable
-fun Indicator(progress: Float) {
+fun IndicatorAppOnlyDifferenceCalculation(
+    onClickStart: () -> Unit,
+    onClickStop: () -> Unit,
+    valueTime: Flow<Int>,
+    activeTimer: Flow<Boolean>,
+    startTime: Flow<Long>
+) {
+//    val currentTime = valueTime.collectAsState(initial = 0)
+    val isActive = activeTimer.collectAsState(initial = false)
+    val startState = startTime.collectAsState(initial = 0)
+
+    var loopCountState by remember { mutableStateOf(0) }
+    var currentTimerState by remember { mutableStateOf(0f) }
+
+    if (isActive.value) {
+        LaunchedEffect(Unit) {
+            while (isActive.value) {
+                delay(1000.milliseconds / 15)
+                val progressTime = System.currentTimeMillis() - startState.value
+                loopCountState = (progressTime / CALC_UNIT).toInt()
+                currentTimerState = progressTime % CALC_UNIT / 1000
+            }
+        }
+    }
+
+    val animatedProgress by animateFloatAsState(
+        targetValue = currentTimerState,
+        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
+    )
+
+    Scaffold(timeText = { TimeText() }) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Indicator(progress = animatedProgress)
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                LoopCountText(countText = loopCountState.toString())
+                CurrentUnitTimeText(countText = "%.2f".format(currentTimerState))
+                StartButton(isActive.value) {
+                    if (isActive.value) {
+                        onClickStop.invoke()
+                    } else {
+                        onClickStart.invoke()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun Indicator(progress: Float, timeUnit: Float = 45f) {
     CircularProgressIndicator(
-        progress = (progress / 45f),
+        progress = (progress / timeUnit),
         modifier = Modifier.fillMaxSize(),
         startAngle = 290f,
         endAngle = 250f,
@@ -100,4 +167,26 @@ fun StartButton(isPlaying: Boolean, onClickPlay: () -> Unit) {
             contentDescription = ""
         )
     }
+}
+
+@Composable
+fun LoopCountText(countText: String) {
+    Text(
+        modifier = Modifier.fillMaxWidth(),
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colors.primary,
+        text = countText,
+        style = MaterialTheme.typography.title3
+    )
+}
+
+@Composable
+fun CurrentUnitTimeText(countText: String) {
+    Text(
+        modifier = Modifier.fillMaxWidth(),
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colors.primary,
+        text = countText,
+        style = MaterialTheme.typography.title1
+    )
 }

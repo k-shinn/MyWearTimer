@@ -62,6 +62,7 @@ class MyForegroundService : LifecycleService() {
     private fun startTimerLoop() {
         timerJob = lifecycleScope.launch {
             dataStore.setActiveTimer(true)
+            dataStore.setStartTime(System.currentTimeMillis())
             timerLoop()
         }
     }
