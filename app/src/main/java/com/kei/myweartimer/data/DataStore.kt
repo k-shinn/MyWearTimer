@@ -5,7 +5,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +16,6 @@ class DataStore(
     companion object {
         private const val DATASTORE_NAME = "my_wear_timer_datastore"
         private val TIMER_RUNNING_KEY = booleanPreferencesKey("timer_running_key")
-        private val VALUE_TIME_KEY = intPreferencesKey("value_time_key")
         private val START_TIME_KEY = longPreferencesKey("start_time_key")
     }
 
@@ -29,10 +27,6 @@ class DataStore(
         it[TIMER_RUNNING_KEY] ?: false
     }
 
-    val valueTime: Flow<Int> = context.dataStore.data.map {
-        it[VALUE_TIME_KEY] ?: 0
-    }
-
     val startTime: Flow<Long> = context.dataStore.data.map {
         it[START_TIME_KEY] ?: 0
     }
@@ -40,12 +34,6 @@ class DataStore(
     suspend fun setTimerRunning(timerRunning: Boolean) {
         context.dataStore.edit {
             it[TIMER_RUNNING_KEY] = timerRunning
-        }
-    }
-
-    suspend fun setValueTime(time: Int) {
-        context.dataStore.edit {
-            it[VALUE_TIME_KEY] = time
         }
     }
 
