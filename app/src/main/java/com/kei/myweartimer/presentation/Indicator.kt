@@ -47,7 +47,6 @@ fun IndicatorApp(
     onClickStop: () -> Unit,
     valueTime: Flow<Int>,
     activeTimer: Flow<Boolean>,
-    startTime: Flow<Long>
 ) {
     val currentTime = valueTime.collectAsState(initial = 0)
     val isActive = activeTimer.collectAsState(initial = false)
@@ -82,7 +81,6 @@ fun IndicatorApp(
 fun IndicatorAppOnlyDifferenceCalculation(
     onClickStart: () -> Unit,
     onClickStop: () -> Unit,
-    valueTime: Flow<Int>,
     activeTimer: Flow<Boolean>,
     startTime: Flow<Long>
 ) {

@@ -61,7 +61,7 @@ class MyForegroundService : LifecycleService() {
 
     private fun startTimerLoop() {
         timerJob = lifecycleScope.launch {
-            dataStore.setActiveTimer(true)
+            dataStore.setTimerRunning(true)
             dataStore.setStartTime(System.currentTimeMillis())
             timerLoop()
         }
@@ -83,7 +83,7 @@ class MyForegroundService : LifecycleService() {
 
     fun stopTimer() {
         lifecycleScope.launch {
-            dataStore.setActiveTimer(false)
+            dataStore.setTimerRunning(false)
         }
         timerJob?.cancel()
         stopForeground(STOP_FOREGROUND_REMOVE)

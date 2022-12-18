@@ -16,7 +16,7 @@ class DataStore(
 ) {
     companion object {
         private const val DATASTORE_NAME = "my_wear_timer_datastore"
-        private val ACTIVE_TIMER_KEY = booleanPreferencesKey("active_timer_key")
+        private val TIMER_RUNNING_KEY = booleanPreferencesKey("timer_running_key")
         private val VALUE_TIME_KEY = intPreferencesKey("value_time_key")
         private val START_TIME_KEY = longPreferencesKey("start_time_key")
     }
@@ -25,8 +25,8 @@ class DataStore(
         name = DATASTORE_NAME
     )
 
-    val activeTimer: Flow<Boolean> = context.dataStore.data.map {
-        it[ACTIVE_TIMER_KEY] ?: false
+    val timerRunning: Flow<Boolean> = context.dataStore.data.map {
+        it[TIMER_RUNNING_KEY] ?: false
     }
 
     val valueTime: Flow<Int> = context.dataStore.data.map {
@@ -37,9 +37,9 @@ class DataStore(
         it[START_TIME_KEY] ?: 0
     }
 
-    suspend fun setActiveTimer(activeTimer: Boolean) {
+    suspend fun setTimerRunning(timerRunning: Boolean) {
         context.dataStore.edit {
-            it[ACTIVE_TIMER_KEY] = activeTimer
+            it[TIMER_RUNNING_KEY] = timerRunning
         }
     }
 

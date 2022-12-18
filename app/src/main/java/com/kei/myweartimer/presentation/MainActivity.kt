@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -32,6 +33,7 @@ import com.kei.myweartimer.R
 import com.kei.myweartimer.data.DataStore
 import com.kei.myweartimer.presentation.theme.MyWearTimerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -40,41 +42,52 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var dataStore: DataStore
 
-    private var myForegroundService: MyForegroundService? = null
+    @Inject
+    lateinit var timerUseCase: TimerUseCase
 
-    private val serviceConnection = object : ServiceConnection {
-        override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-            val binder = p1 as MyForegroundService.LocalBinder
-            myForegroundService = binder.myForegroundService
-        }
-
-        override fun onServiceDisconnected(p0: ComponentName?) {
-            myForegroundService = null
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val intent = Intent(this, MyForegroundService::class.java)
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
-    }
+//    private var myForegroundService: MyForegroundService? = null
+//
+//    private val serviceConnection = object : ServiceConnection {
+//        override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
+//            val binder = p1 as MyForegroundService.LocalBinder
+//            myForegroundService = binder.myForegroundService
+//        }
+//
+//        override fun onServiceDisconnected(p0: ComponentName?) {
+//            myForegroundService = null
+//        }
+//    }
+//
+//    override fun onStart() {
+//        super.onStart()
+//        val intent = Intent(this, MyForegroundService::class.java)
+//        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-//            WearApp("Android")
+            val composableScope = rememberCoroutineScope()
             MyWearTimerTheme {
 //                IndicatorApp(
+//                    onClickStart = {},
+//                    onClickStop = {},
+//                    valueTime = dataStore.valueTime,
+//                    activeTimer = dataStore.activeTimer
+//                )
                 IndicatorAppOnlyDifferenceCalculation(
                     onClickStart = {
-                        myForegroundService?.startTimer()
+                        composableScope.launch {
+                            timerUseCase.startTimer()
+                        }
                     },
                     onClickStop = {
-                        myForegroundService?.stopTimer()
+                        composableScope.launch {
+                            timerUseCase.stopTimer()
+                        }
                     },
-                    dataStore.valueTime,
-                    dataStore.activeTimer,
-                    dataStore.startTime
+                    activeTimer = dataStore.timerRunning,
+                    startTime = dataStore.startTime
                 )
             }
         }
