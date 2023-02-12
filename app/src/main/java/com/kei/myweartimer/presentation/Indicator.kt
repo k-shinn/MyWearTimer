@@ -41,7 +41,8 @@ fun IndicatorAppOnlyDifferenceCalculation(
     onClickStart: () -> Unit,
     onClickStop: () -> Unit,
     timerActivationState: Flow<Boolean>,
-    startTime: Flow<Long>
+    startTime: Flow<Long>,
+    onLoopCountUp: () -> Unit,
 ) {
     val isActive = timerActivationState.collectAsState(initial = false)
     val startState = startTime.collectAsState(initial = 0)
@@ -54,7 +55,9 @@ fun IndicatorAppOnlyDifferenceCalculation(
             while (isActive.value) {
                 delay(1000.milliseconds / 15)
                 val progressTime = System.currentTimeMillis() - startState.value
-                loopCountState = (progressTime / REPEAT_COUNT_MILL_SEC).toInt()
+                val newLoopCount = (progressTime / REPEAT_COUNT_MILL_SEC).toInt()
+                if (newLoopCount != loopCountState) onLoopCountUp.invoke()
+                loopCountState = newLoopCount
                 currentTimerState = progressTime % REPEAT_COUNT_MILL_SEC / 1000
             }
         }
