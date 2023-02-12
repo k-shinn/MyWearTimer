@@ -16,12 +16,21 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    // Bind型
     // 1.画面起動中はForegroundサービスに接続
     // 2.タイマースタートと同時にOnGoingActivity起動、タイマー起動中がわかるように。
-    // 3.タイマー起動中は画面が自動Offにならない設定追加
-    // 4.Loop切り替わりで音or振動で知らせる機能追加
+    // 3.Loop切り替わりで音or振動で知らせる機能追加
     //   a.タイマー起動時にスケジュールを作って発行しておく、停止時には切るようにする
     //   b.なんらかの不具合でタイマーだけ残らないよう、画面起動時にタイマーがアクティブか調べて、止まっていたらスケジュールも破棄する
+
+    // Foreground型
+    // 1.タイマースタートと同時にService起動、OnGoingActivity発行してForeground動作
+    // 2.起動時にLoopタイミングでのスケジュール発行
+    // 3.スケジュールタイミングになったら音or振動で知らせる、そのまま次のLoopスケジュール発行
+    // 4.タイマー停止と同時にServiceもスケジュールも破棄
+    // 5.不具合対策に画面起動時にはタイマーがアクティブか調べて、止まっていたらスケジュールもServiceも破棄する
+
+    // ex.タイマー起動中は画面が自動Offにならない設定追加
 
     @Inject
     lateinit var dataStore: DataStore
