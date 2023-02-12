@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
                             timerUseCase.stopTimer()
                         }
                     },
-                    activeTimer = dataStore.timerRunning,
+                    timerActivationState = dataStore.isTimerRunning,
                     startTime = dataStore.startTime
                 )
             }

@@ -23,7 +23,7 @@ class DataStore(
         name = DATASTORE_NAME
     )
 
-    val timerRunning: Flow<Boolean> = context.dataStore.data.map {
+    val isTimerRunning: Flow<Boolean> = context.dataStore.data.map {
         it[TIMER_RUNNING_KEY] ?: false
     }
 

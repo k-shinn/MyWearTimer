@@ -41,10 +41,10 @@ const val CALC_UNIT = TIME_UNIT * 1000
 fun IndicatorAppOnlyDifferenceCalculation(
     onClickStart: () -> Unit,
     onClickStop: () -> Unit,
-    activeTimer: Flow<Boolean>,
+    timerActivationState: Flow<Boolean>,
     startTime: Flow<Long>
 ) {
-    val isActive = activeTimer.collectAsState(initial = false)
+    val isActive = timerActivationState.collectAsState(initial = false)
     val startState = startTime.collectAsState(initial = 0)
 
     var loopCountState by remember { mutableStateOf(0) }
