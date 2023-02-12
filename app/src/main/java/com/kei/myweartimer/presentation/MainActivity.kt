@@ -12,6 +12,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
+const val REPEAT_COUNT_SEC = 5
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -34,6 +37,8 @@ class MainActivity : ComponentActivity() {
     // WorkManager or AlarmManager
     // - 音or振動のスケジュール管理はManagerに任せる
     // - 進行中表示のみService管理が必要？
+    // -> 定義可能な最小繰り返し間隔は 15 分 ダメだ…
+    // 表示中だけでいいか、音は
 
     @Inject
     lateinit var dataStore: DataStore

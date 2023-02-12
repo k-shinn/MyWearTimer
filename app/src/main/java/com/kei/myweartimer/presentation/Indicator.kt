@@ -34,8 +34,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Duration.Companion.milliseconds
 
-const val TIME_UNIT = 45f
-const val CALC_UNIT = TIME_UNIT * 1000
+const val REPEAT_COUNT_MILL_SEC = REPEAT_COUNT_SEC.toFloat() * 1000
 
 @Composable
 fun IndicatorAppOnlyDifferenceCalculation(
@@ -55,8 +54,8 @@ fun IndicatorAppOnlyDifferenceCalculation(
             while (isActive.value) {
                 delay(1000.milliseconds / 15)
                 val progressTime = System.currentTimeMillis() - startState.value
-                loopCountState = (progressTime / CALC_UNIT).toInt()
-                currentTimerState = progressTime % CALC_UNIT / 1000
+                loopCountState = (progressTime / REPEAT_COUNT_MILL_SEC).toInt()
+                currentTimerState = progressTime % REPEAT_COUNT_MILL_SEC / 1000
             }
         }
     }
@@ -89,7 +88,7 @@ fun IndicatorAppOnlyDifferenceCalculation(
 }
 
 @Composable
-fun Indicator(progress: Float, timeUnit: Float = 45f) {
+fun Indicator(progress: Float, timeUnit: Float = REPEAT_COUNT_SEC.toFloat()) {
     CircularProgressIndicator(
         progress = (progress / timeUnit),
         modifier = Modifier.fillMaxSize(),
