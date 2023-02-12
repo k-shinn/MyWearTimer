@@ -31,6 +31,10 @@ class MainActivity : ComponentActivity() {
 
     // ex.タイマー起動中は画面が自動Offにならない設定追加
 
+    // WorkManager or AlarmManager
+    // - 音or振動のスケジュール管理はManagerに任せる
+    // - 進行中表示のみService管理が必要？
+
     @Inject
     lateinit var dataStore: DataStore
 
